@@ -1,0 +1,10 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: svc-external-frontend
+  namespace: common
+spec:
+  type: ExternalName
+  externalName: svc-frontend.frontend.svc.cluster.local
+  ports:
+  - port: 80

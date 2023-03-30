@@ -1,0 +1,58 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: clusterk8s
+
+nodes:
+  - role: control-plane
+    kubeadmConfigPatches:
+    - |
+      kind: ClusterConfiguration
+      apiServer:
+          extraArgs:
+            encryption-provider-config: "/etc/kubernetes/encryptionvolume/encryption.yaml"
+          extraVolumes:
+            - name: "encryptionvolume"
+              hostPath: "/etc/kubernetes/encryptionvolume"
+              mountPath: "/etc/kubernetes/encryptionvolume"
+              readOnly: true
+              pathType: DirectoryOrCreate
+    extraMounts:
+    - hostPath: /home/matheusoliveira/Opus/Kubernetes/Projeto/utils/encryptionvolume
+      containerPath: /etc/kubernetes/encryptionvolume
+  - role: worker
+    kubeadmConfigPatches:
+    - |
+      kind: JoinConfiguration
+      nodeRegistration:
+        kubeletExtraArgs:
+          node-labels: "ingress-ready=true"
+    extraPortMappings:
+    - containerPort: 80
+      hostPort: 81
+      protocol: TCP
+    - containerPort: 443
+      hostPort: 444
+      protocol: TCP
+    - containerPort: 30101
+      hostPort: 30101
+      listenAddress: "0.0.0.0"
+      protocol: TCP
+  - role: worker
+    kubeadmConfigPatches:
+    - |
+      kind: JoinConfiguration
+      nodeRegistration:
+        kubeletExtraArgs:
+          node-labels: "ingress-ready=true"
+    extraPortMappings:
+    - containerPort: 80
+      hostPort: 80
+      protocol: TCP
+    - containerPort: 443
+      hostPort: 443
+      protocol: TCP
+    - containerPort: 30100
+      hostPort: 30100
+      listenAddress: "0.0.0.0"
+      protocol: TCP
+

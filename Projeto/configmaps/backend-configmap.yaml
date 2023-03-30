@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap-backend
+  namespace: backend
+
+data:
+  HOST_DB: svc-db-mysql.database:3306
+
+  

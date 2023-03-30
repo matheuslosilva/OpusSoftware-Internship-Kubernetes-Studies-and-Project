@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: List
+items:
+  - apiVersion: v1
+    kind: Namespace
+    metadata:
+        name: database
+  - apiVersion: v1
+    kind: Namespace
+    metadata:
+        name: frontend
+  - apiVersion: v1
+    kind: Namespace
+    metadata:
+        name: backend
+  - apiVersion: v1
+    kind: Namespace
+    metadata:
+        name: common
+
+---
+
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: compute-quota
+  namespace: frontend
+
+spec:
+  hard:
+    requests.cpu: "200m"
+    limits.cpu: "300m"
+    # pods: "10"
+    # requests.memory: 5Gi
+    # limits.memory: 10Gi

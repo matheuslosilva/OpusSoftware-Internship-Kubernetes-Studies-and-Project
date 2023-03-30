@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: statefulset-backend
+  namespace: backend
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: backend
+      labels:
+        app: backend   
+    spec:
+      nodeName: clusterbackup-worker
+      containers:
+        - name: backend-container
+          image: aluracursos/sistema-noticias:1
+          ports:
+            - containerPort: 80
+          env:
+            - name: USER_DB
+              valueFrom:
+                secretKeyRef:
+                  name: secret-backend
+                  key: USER_DB
+                  optional: false
+            - name: PASS_DB
+              valueFrom:
+                secretKeyRef:
+                  name: secret-backend
+                  key: PASS_DB
+                  optional: false 
+            - name: DATABASE_DB
+              valueFrom:
+                secretKeyRef:
+                  name: secret-backend
+                  key: DATABASE_DB
+                  optional: false 
+          envFrom:
+            - configMapRef:
+                name: configmap-backend
+
+          volumeMounts:
+            - name: imagens
+              mountPath: /var/www/html/uploads
+            - name: sessao
+              mountPath: /tmp
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            periodSeconds: 15
+            failureThreshold: 3
+            initialDelaySeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /inserir_noticias.php
+              port: 80
+            periodSeconds: 15
+            failureThreshold: 5
+            initialDelaySeconds: 3
+            
+      volumes:
+        - name: imagens
+          persistentVolumeClaim:
+            claimName: pvc-imagens
+        - name: sessao
+          persistentVolumeClaim:
+            claimName: pvc-sessao
+  selector:
+    matchLabels:
+      app: backend
+  serviceName: svc-backend

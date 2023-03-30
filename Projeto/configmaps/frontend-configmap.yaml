@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap-frontend
+  namespace: frontend
+data:
+  IP_SISTEMA: http://localhost:30101

@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-frontend
+  namespace: frontend
+spec:
+  template:
+    metadata:
+      name: frontend
+      labels:
+        app: frontend
+    spec:
+      nodeName: clusterbackup-worker2 
+      containers:
+        - name: frontend-container
+          image: aluracursos/portal-noticias:1
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: configmap-frontend
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            periodSeconds: 10
+            failureThreshold: 3
+            initialDelaySeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            periodSeconds: 10
+            failureThreshold: 5
+            initialDelaySeconds: 3
+          resources:
+            requests:
+              cpu: 50m
+            limits:
+              cpu: 80m
+      
+  replicas: 3
+  selector:
+    matchLabels:
+      app: frontend

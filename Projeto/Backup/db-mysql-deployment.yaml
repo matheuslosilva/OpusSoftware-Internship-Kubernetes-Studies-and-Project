@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-db-mysql
+  namespace: database
+spec:
+  template:
+    metadata:
+      name: db-mysql
+      labels:
+        app: db-mysql
+    spec:
+      nodeName: clusterbackup-worker
+      containers:
+        - name: db-mysql-container
+          image: aluracursos/mysql-db:1
+          ports:
+            - containerPort: 3306
+          envFrom:
+            - configMapRef:
+                name: configmap-db-mysql
+          env:
+            - name: MYSQL_ROOT_PASSWORD_FILE
+              value: /run/secrets/secret-db-mysql/MYSQL_ROOT_PASSWORD
+            - name: MYSQL_PASSWORD_FILE
+              value: /run/secrets/secret-db-mysql/MYSQL_PASSWORD
+
+          volumeMounts:
+            - name: secret-db-mysql
+              readOnly: true
+              mountPath: "/run/secrets/secret-db-mysql"
+      volumes:
+        - name: secret-db-mysql
+          secret:
+            secretName: secret-db-mysql
+  selector:
+    matchLabels:
+      app: db-mysql

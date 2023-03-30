@@ -1,0 +1,15 @@
+sudo kind create cluster --config utils/cluster-config.yaml
+
+sudo kubectl apply -f namespaces.yaml
+sudo helm upgrade --install metrics-server metrics-server/metrics-server --set hostNetwork.enabled=true -f utils/valuesMetricsServer.yaml
+sudo helm install nfs-subdir-external-provisioner nfs-subdir-external-provisioner/nfs-subdir-external-provisioner --set nfs.server=172.17.0.1 --set nfs.path=/srv/nfs/k8sdata
+sudo kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+sudo kubectl apply -f services/.
+sudo kubectl apply -f pvc/.
+sudo kubectl apply -f configmaps/.
+sudo kubectl apply -f secrets/.
+sudo kubectl apply -f backend-statefulset.yaml
+sudo kubectl apply -f db-mysql-deployment.yaml
+sudo kubectl apply -f frontend-deployment.yaml
+sudo kubectl apply -f frontend-hpa.yaml
+sudo kubectl apply -f utils/ingress-config.yaml
